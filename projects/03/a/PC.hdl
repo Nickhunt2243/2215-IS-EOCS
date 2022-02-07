@@ -1,0 +1,48 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/03/a/PC.hdl
+
+/**
+ * A 16-bit counter with load and reset control bits.
+ * if      (reset[t] == 1) out[t+1] = 0
+ * else if (load[t] == 1)  out[t+1] = in[t]
+ * else if (inc[t] == 1)   out[t+1] = out[t] + 1  (integer addition)
+ * else                    out[t+1] = out[t]
+ */
+
+CHIP PC {
+    IN in[16], load, inc, reset;
+    OUT out[16];
+
+    PARTS:
+// Defining variables we will use later
+    // Improvising for no Xor16 - Xor16(a=in, b=in, out=zeroConst);
+
+    Not16(in=in, out=inOut);
+    And16(a=inOut, b=in, out=XorConst1);
+    And16(a=in, b=inOut, out=XorConst2);
+    Or16(a=XorConst1, b=XorConst2, out=zeroConst); 
+
+    Not(in=inc, out=NotInc);
+    
+    Or(a=load, b=inc, out=And1out);
+    Or(a=reset, b=And1out, out=LoadRegister);
+    
+// If we are incrementing then we know inc is 1 so we use that as out 1 constant
+
+    ALU(x=internalOut, y=zeroConst, zx=NotInc, nx=inc, zy=inc, ny=inc, f=inc, no=inc, out=inIncremented, zr=zr, ng=ng);
+    
+// Developing the Mux design I chose to pair [load, inc, reset] as a 3 bit select bit and 
+// places my appropriate inputs elsewhere.
+// 001 = load 
+// 010 = inc
+// 100 = reset
+    Mux8Way16(a=internalOut,   b=in,         c=inIncremented, 
+              d=in, e=zeroConst,  f=zeroConst, 
+              g=zeroConst,     h=zeroConst,  sel[0]=load, 
+              sel[1]=inc,      sel[2]=reset, out=RegisterIn);
+
+// Developing the Register use
+    Register(in=RegisterIn, load=LoadRegister, out=internalOut, out=out);
+}

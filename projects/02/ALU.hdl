@@ -1,0 +1,143 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/02/ALU.hdl
+
+/**
+ * The ALU (Arithmetic Logic Unit).
+ * Computes one of the following functions:
+ * x+y, x-y, y-x, 0, 1, -1, x, y, -x, -y, !x, !y,
+ * x+1, y+1, x-1, y-1, x&y, x|y on two 16-bit inputs, 
+ * according to 6 input bits denoted zx,nx,zy,ny,f,no.
+ * In addition, the ALU computes two 1-bit outputs:
+ * if the ALU output == 0, zr is set to 1; otherwise zr is set to 0;
+ * if the ALU output < 0, ng is set to 1; otherwise ng is set to 0.
+ */
+
+// Implementation: the ALU logic manipulates the x and y inputs
+// and operates on the resulting values, as follows:
+// if (zx == 1) set x = 0        // 16-bit constant
+// if (nx == 1) set x = !x       // bitwise not
+// if (zy == 1) set y = 0        // 16-bit constant
+// if (ny == 1) set y = !y       // bitwise not
+// if (f == 1)  set out = x + y  // integer 2's complement addition
+// if (f == 0)  set out = x & y  // bitwise and
+// if (no == 1) set out = !out   // bitwise not
+// if (out == 0) set zr = 1
+// if (out < 0) set ng = 1
+
+CHIP ALU {
+    IN  
+        x[16], y[16],  // 16-bit inputs        
+        zx, // zero the x input?
+        nx, // negate the x input?
+        zy, // zero the y input?
+        ny, // negate the y input?
+        f,  // compute out = x + y (if 1) or x & y (if 0)
+        no; // negate the out output?
+
+    OUT 
+        out[16], // 16-bit output
+        zr, // 1 if (out == 0), 0 otherwise
+        ng; // 1 if (out < 0),  0 otherwise
+
+    
+    PARTS:
+    // Obtaining out 16-bit 0 and 1 constants
+
+        // There is no Xor16 so we improvise with other gates
+        Not16(in=x, out=xout);
+        And16(a=xout, b=x, out=XorConst1);
+        And16(a=x, b=xout, out=XorConst2);
+        Or16(a=XorConst1, b=XorConst2, out=zeroConst);         // Getting a 1-bit zero constant
+        
+        Not16(in=zeroConst, out=oneConst);                        // Getting a 1-bit one constant
+
+    // Mux Design for zx and nx via Mux16
+
+        Mux16(a=x, b=zeroConst, sel=zx, out=OutXpart1);
+
+        // There is no Xor16 so we improvise with other gates
+        // Xor16(a=OutXpart1, b=oneConst, out=NegateX);
+
+        Not16(in=OutXpart1, out=negateXPart1);
+        And16(a=negateXPart1, b=oneConst, out=XorX1);
+        And16(a=OutXpart1, b=zeroConst, out=XorX2);
+        Or16(a=XorX1, b=XorX2, out=NegateX);
+
+        Mux16(a=OutXpart1, b=NegateX, sel=nx, out=OutXpart2);
+
+    // Mux Design for zy and ny via Mux16
+
+        Mux16(a=y, b=zeroConst, sel=zy, out=OutYpart1);
+
+        // There is no Xor16 so we improvise with other gates
+        // Xor16(a=OutYpart1, b=oneConst, out=NegateY); 
+
+        Not16(in=OutYpart1, out=negateYPart1);
+        And16(a=negateYPart1, b=oneConst, out=XorY1);
+        And16(a=OutYpart1, b=zeroConst, out=XorY2);
+        Or16(a=XorY1, b=XorY2, out=NegateY);
+
+        Mux16(a=OutYpart1, b=NegateY, sel=ny, out=OutYpart2);
+
+    // Mux Design for f input via Mux16
+
+        Add16(a=OutXpart2, b=OutYpart2, out=AddingXY);
+
+        And16(a=OutXpart2, b=OutYpart2, out=AndingXY);
+
+        Mux16(a=AndingXY, b=AddingXY, sel=f, out=FOutput);
+
+    // Mux Design for no via Mux16
+
+        // Xor16(a=FOutput, b=oneConst, out=NegateFOutput);
+
+        Not16(in=FOutput, out=negFOutput);
+        And16(a=negFOutput, b=oneConst, out=XorFOutput1);
+        And16(a=FOutput, b=zeroConst, out=XorFOutput2);
+        Or16(a=XorFOutput1, b=XorFOutput2, out=NegateFOutput);
+
+        Mux16(a=FOutput, b=NegateFOutput, sel=no, out=out,  out[0]=check0,   out[1]=check1,
+                                                            out[2]=check2,   out[3]=check3,
+                                                            out[4]=check4,   out[5]=check5,
+                                                            out[6]=check6,   out[7]=check7,
+                                                            out[8]=check8,   out[9]=check9,
+                                                            out[10]=check10, out[11]=check11,
+                                                            out[12]=check12, out[13]=check13,
+                                                            out[14]=check14, out[15]=check15);
+
+    // Design for zr and ng 
+
+        //Or-ing all the output bits together to check for any 1's 
+
+        Or(a=check0,     b=check1,  out=checkout1);
+        Or(a=checkout1,  b=check2,  out=checkout2);
+        Or(a=checkout2,  b=check3,  out=checkout3);
+        Or(a=checkout3,  b=check4,  out=checkout4);
+        Or(a=checkout4,  b=check5,  out=checkout5);
+        Or(a=checkout5,  b=check6,  out=checkout6);
+        Or(a=checkout6,  b=check7,  out=checkout7);
+        Or(a=checkout7,  b=check8,  out=checkout8);
+        Or(a=checkout8,  b=check9,  out=checkout9);
+        Or(a=checkout9,  b=check10, out=checkout10);
+        Or(a=checkout10, b=check11, out=checkout11);
+        Or(a=checkout11, b=check12, out=checkout12);
+        Or(a=checkout12, b=check13, out=checkout13);
+        Or(a=checkout13, b=check14, out=checkout14);
+        Or(a=checkout14, b=check15, out=checkout15);
+
+        // Then we will negate the check because if there are any 1's we want zr == 0 (rather than 1).
+
+        Not(in=checkout15, out=zr);
+
+        // Checking if output is greater than 0 by 
+        // Checking greatest significant bit
+
+        Xor(a=x[0], b=x[0], out=BitZeroConst);
+        Not(in=BitZeroConst, out=BitOneConst);
+        And(a=check15, b=BitOneConst, out=ng);
+
+
+
+}

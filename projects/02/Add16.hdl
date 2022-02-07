@@ -1,0 +1,156 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/02/Adder16.hdl
+
+/**
+ * Adds two 16-bit values.
+ * The most significant carry bit is ignored.
+ */
+
+CHIP Add16 {
+    IN a[16], b[16];
+    OUT out[16];
+
+    PARTS:
+	Xor(a=a[0],    b=b[0], out=out[0]);
+	And(a=a[0],    b=b[0], out=carry1);
+
+	Xor(a=carry1, b=b[1],  out=Xorb1);
+	Xor(a=a[1],   b=Xorb1, out=ans1);
+	Xor(a=a[1],   b=Xorb1, out=out[1]);
+	And(a=a[1],   b=b[1], out=Andab1);
+	And(a=carry1, b=a[1], out=Andcarrya1);
+	And(a=carry1, b=b[1], out=Andcarryb1);
+	Or (a=Andab1, b=Andcarrya1, out=Or1);
+	Or (a=Or1,     b=Andcarryb1, out=carry2);
+
+
+	Xor(a=carry2, b=b[2], out=Xorb2);
+	Xor(a=a[2], b=Xorb2, out=ans2);
+	Xor(a=a[2], b=Xorb2, out=out[2]);
+	And(a=a[2],   b=b[2], out=Andab2);
+	And(a=carry2, b=a[2], out=Andcarrya2);
+	And(a=carry2, b=b[2], out=Andcarryb2);
+	Or (a=Andab2, b=Andcarrya2, out=Or2);
+	Or (a=Or2,     b=Andcarryb2, out=carry3);
+
+	Xor(a=carry3, b=b[3], out=Xorb3);
+	Xor(a=a[3], b=Xorb3, out=ans3);
+	Xor(a=a[3], b=Xorb3, out=out[3]);
+	And(a=a[3],   b=b[3], out=Andab3);
+	And(a=carry3, b=a[3], out=Andcarrya3);
+	And(a=carry3, b=b[3], out=Andcarryb3);
+	Or (a=Andab3, b=Andcarrya3, out=Or3);
+	Or (a=Or3,     b=Andcarryb3, out=carry4);
+	
+	Xor(a=carry4, b=b[4], out=Xorb4);
+	Xor(a=a[4], b=Xorb4, out=ans4);
+	Xor(a=a[4], b=Xorb4, out=out[4]);
+	And(a=a[4],   b=b[4], out=Andab4);
+	And(a=carry4, b=a[4], out=Andcarrya4);
+	And(a=carry4, b=b[4], out=Andcarryb4);
+	Or (a=Andab4, b=Andcarrya4, out=Or4);
+	Or (a=Or4,     b=Andcarryb4, out=carry5);
+
+	Xor(a=carry5, b=b[5], out=Xorb5);
+	Xor(a=a[5], b=Xorb5, out=ans5);
+	Xor(a=a[5], b=Xorb5, out=out[5]);
+	And(a=a[5],   b=b[5], out=Andab5);
+	And(a=carry5, b=a[5], out=Andcarrya5);
+	And(a=carry5, b=b[5], out=Andcarryb5);
+	Or (a=Andab5, b=Andcarrya5, out=Or5);
+	Or (a=Or5,     b=Andcarryb5, out=carry6);
+
+	Xor(a=carry6, b=b[6], out=Xorb6);
+	Xor(a=a[6], b=Xorb6, out=ans6);
+	Xor(a=a[6], b=Xorb6, out=out[6]);
+	And(a=a[6],   b=b[6], out=Andab6);
+	And(a=carry6, b=a[6], out=Andcarrya6);
+	And(a=carry6, b=b[6], out=Andcarryb6);
+	Or (a=Andab6, b=Andcarrya6, out=Or6);
+	Or (a=Or6,     b=Andcarryb6, out=carry7);
+
+	Xor(a=carry7, b=b[7], out=Xorb7);
+	Xor(a=a[7], b=Xorb7, out=ans7);
+	Xor(a=a[7], b=Xorb7, out=out[7]);
+	And(a=a[7],   b=b[7], out=Andab7);
+	And(a=carry7, b=a[7], out=Andcarrya7);
+	And(a=carry7, b=b[7], out=Andcarryb7);
+	Or (a=Andab7, b=Andcarrya7, out=Or7);
+	Or (a=Or7,     b=Andcarryb7, out=carry8);
+
+	Xor(a=carry8, b=b[8], out=Xorb8);
+	Xor(a=a[8], b=Xorb8, out=ans8);
+	Xor(a=a[8], b=Xorb8, out=out[8]);
+	And(a=a[8],   b=b[8], out=Andab8);
+	And(a=carry8, b=a[8], out=Andcarrya8);
+	And(a=carry8, b=b[8], out=Andcarryb8);
+	Or (a=Andab8, b=Andcarrya8, out=Or8);
+	Or (a=Or8,     b=Andcarryb8, out=carry9);
+
+	Xor(a=carry9, b=b[9], out=Xorb9);
+	Xor(a=a[9], b=Xorb9, out=ans9);
+	Xor(a=a[9], b=Xorb9, out=out[9]);
+	And(a=a[9],   b=b[9], out=Andab9);
+	And(a=carry9, b=a[9], out=Andcarrya9);
+	And(a=carry9, b=b[9], out=Andcarryb9);
+	Or (a=Andab9, b=Andcarrya9, out=Or9);
+	Or (a=Or9,     b=Andcarryb9, out=carry10);
+
+	Xor(a=carry10, b=b[10], out=Xorb10);
+	Xor(a=a[10], b=Xorb10, out=ans10);
+	Xor(a=a[10], b=Xorb10, out=out[10]);
+	And(a=a[10],   b=b[10], out=Andab10);
+	And(a=carry10, b=a[10], out=Andcarrya10);
+	And(a=carry10, b=b[10], out=Andcarryb10);
+	Or (a=Andab10, b=Andcarrya10, out=Or10);
+	Or (a=Or10,     b=Andcarryb10, out=carry11);
+
+	Xor(a=carry11, b=b[11], out=Xorb11);
+	Xor(a=a[11], b=Xorb11, out=ans11);
+	Xor(a=a[11], b=Xorb11, out=out[11]);
+	And(a=a[11],   b=b[11], out=Andab11);
+	And(a=carry11, b=a[11], out=Andcarrya11);
+	And(a=carry11, b=b[11], out=Andcarryb11);
+	Or (a=Andab11, b=Andcarrya11, out=Or11);
+	Or (a=Or11,     b=Andcarryb11, out=carry12);
+
+	Xor(a=carry12, b=b[12], out=Xorb12);
+	Xor(a=a[12], b=Xorb12, out=ans12);
+	Xor(a=a[12], b=Xorb12, out=out[12]);
+	And(a=a[12],   b=b[12], out=Andab12);
+	And(a=carry12, b=a[12], out=Andcarrya12);
+	And(a=carry12, b=b[12], out=Andcarryb12);
+	Or (a=Andab12, b=Andcarrya12, out=Or12);
+	Or (a=Or12,     b=Andcarryb12, out=carry13);
+	
+	Xor(a=carry13, b=b[13], out=Xorb13);
+	Xor(a=a[13],   b=Xorb13, out=ans13);
+	Xor(a=a[13],   b=Xorb13, out=out[13]);
+	And(a=a[13],   b=b[13], out=Andab13);
+	And(a=carry13, b=a[13], out=Andcarrya13);
+	And(a=carry13, b=b[13], out=Andcarryb13);
+	Or (a=Andab13, b=Andcarrya13, out=Or13);
+	Or (a=Or13,    b=Andcarryb13, out=carry14);
+
+	Xor(a=carry14, b=b[14],       out=Xorb14);
+	Xor(a=a[14],   b=Xorb14,      out=ans14);
+	Xor(a=a[14],   b=Xorb14,      out=out[14]);
+	And(a=a[14],   b=b[14],       out=Andab14);
+	And(a=carry14, b=a[14],       out=Andcarrya14);
+	And(a=carry14, b=b[14],       out=Andcarryb14);
+	Or (a=Andab14, b=Andcarrya14, out=Or14);
+	Or (a=Or14,    b=Andcarryb14, out=carry15);
+
+	Xor(a=carry15, b=b[15], out=Xorb15);
+	Xor(a=a[15], b=Xorb15, out=ans15);
+	Xor(a=a[15], b=Xorb15, out=out[15]);
+	
+	
+	And(a=a[15],   b=b[15], out=Andab15);
+	And(a=carry15, b=a[15], out=Andcarrya15);
+	And(a=carry15, b=b[15], out=Andcarryb15);
+	Or (a=Andab15, b=Andcarrya15, out=Or15);
+	Or (a=Or15,     b=Andcarryb15, out=carry16);
+}

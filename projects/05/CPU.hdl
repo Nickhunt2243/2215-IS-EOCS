@@ -39,5 +39,59 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-    // Put your code here:
+    // C-Instructions: 1xxaccccccdddjjj
+    //                 fedcba9876543210
+
+    And(a = instruction[15], b = instruction[3], out = writeM); 
+
+// Mux deciding whether to load instruction or the ALU output into the A register 
+    And(a = instruction[15], b = instruction[5], out = selInsALU);
+    Mux16(a = instruction, b = ALUoutput, sel = selInsALU, out = toARegister);
+
+// Mux to decide whether to use A or M register
+    Mux16(a = ARegister, b = inM, sel = instruction[12] , out = toALU);
+    
+// The A register
+    Not(in = instruction[15], out = notMSB);
+    And(a = instruction[5], b = instruction[15], out = WriteALUOut);
+    Or(a = WriteALUOut, b = notMSB, out = writeA);
+    Register(in = toARegister, load = writeA, out = ARegister, out[0..14]=addressM);
+
+// The D register
+    And(a = instruction[4], b = instruction[15], out = WriteD);
+    Register(in = ALUoutput, load = WriteD, out = DRegister);
+
+// Implementing the Program Counter with logic on whether to jump or not
+
+    // Creating greater than from ng
+    Not(in = ng, out = gt);
+    
+    // Creating a one constant to default the PC to increment
+    Not(in = instruction[0], out = notJ1);
+    Xor(a = instruction[0], b = notJ1, out = oneConst);
+
+    // Creating logic for whether to jump
+        // >= 0
+        And(a = gt, b = instruction[0], out = loadgtpart1);
+        // deriving > 0 from >= 0 && != 0
+        Not(in = zr, out = notzr);
+        And(a = loadgtpart1, b = notzr, out = loadgtpart2);
+        And(a = instruction[15], b = loadgtpart2, out = loadgt);
+        // == 0 jump
+        And(a = zr, b = instruction[1], out = loadeqpart1);
+        And(a = instruction[15], b = loadeqpart1, out = loadeq);
+        // < 0
+        And(a = ng, b = instruction[2], out = loadltpart1);
+        And(a = instruction[15], b = loadltpart1, out = loadlt);
+        // Or-ing the results together
+        Or(a = loadgt, b = loadeq,    out = loadpart1);
+        Or(a = loadlt, b = loadpart1, out = load);
+
+    PC(in = ARegister, load = load, inc = oneConst, reset = reset, out[0..14] = pc);
+
+// ALU Implementation
+    ALU(x   = DRegister,            y  = toALU,          zx  = instruction[11], 
+        nx  = instruction[10], zy = instruction[9], ny  = instruction[8], 
+        f   = instruction[7],  no = instruction[6], out = ALUoutput, 
+        out = outM,            zr = zr,             ng  = ng);
 }

@@ -10,3 +10,28 @@
 // R0 >= 0, R1 >= 0, and R0*R1 < 32768.
 
 // Put your code here.
+
+// Multiplication is just iterative adding
+// FOR (INT I=R0; R0>0; R0--){ 
+//    R2 += R1;
+// }
+    @R2
+    M=0
+(LOOP)
+    // R0--;
+    @R0
+    D=M
+    @END
+    D;JEQ
+    @R0
+    M=D-1
+    // R2 += R1  
+    @R1
+    D=M
+    @R2
+    M=M+D
+    @LOOP
+    0;JMP
+(END)
+    @END
+    0;JMP

@@ -1,0 +1,52 @@
+function Enum.new 0
+push constant 0
+call Memory.alloc 1
+pop pointer 0
+push constant 0
+pop static 0
+push constant 1
+pop static 1
+push constant 2
+pop static 2
+push pointer 0
+return
+function Enum.getINTEGER 0
+push argument 0
+pop pointer 0
+push static 1
+return
+function Enum.getCHARACTER 0
+push argument 0
+pop pointer 0
+push static 0
+return
+function Enum.getBOOLEAN 0
+push argument 0
+pop pointer 0
+push static 2
+return
+function Enum.equals 0
+push argument 0
+pop pointer 0
+push argument 1
+push argument 2
+eq
+not
+return
+function Enum.dispose 0
+push argument 0
+pop pointer 0
+push static 0
+call Memory.deAlloc 1
+pop temp 0
+push static 1
+call Memory.deAlloc 1
+pop temp 0
+push static 2
+call Memory.deAlloc 1
+pop temp 0
+push pointer 0
+call Memory.deAlloc 1
+pop temp 0
+push constant 0
+return

@@ -1,0 +1,232 @@
+// This is the Queue.jack module of the Queue package. 
+// It is the class for the Queue object. 
+// 
+// Username: nrh9573
+// File: projects/09/Queue/Queue.jack
+
+class Queue {
+    /** 
+        The array that will hold all the queued elements. 
+    */
+    field Array queue;
+    /** 
+        The array that will hold all the types of the queued elements. 
+    */
+    field Array typeList;
+    /** 
+        The unit we will increment the queues capacity by each time we allocates
+        more space. 
+    */
+    field int QUEUE_ALLOC_UNIT;	
+    /** 
+        The capacity of the queue. 
+    */
+    field int capacity;
+    /** 
+        The number of elements in the queue. 
+    */
+    field int size;
+    /** 
+        The Enum class for the data types. 
+    */
+    field Enum typeEnum;
+
+    /** 
+        The constructor for the Queue class. It instantiates an array as the
+        Queue. It also allocates field variables QUEUE_ALLOC_UNIT and size to 
+        5 and 0 respectively. As well as initializes the elements of the Queue 
+        Array to null. 
+    */
+    constructor Queue new() {
+        let QUEUE_ALLOC_UNIT = 5;
+        let size = QUEUE_ALLOC_UNIT;
+        let capacity = QUEUE_ALLOC_UNIT;
+
+        let queue = Array.new( QUEUE_ALLOC_UNIT );
+        let typeList = Array.new( QUEUE_ALLOC_UNIT );
+        let typeEnum = Enum.new();
+
+        // Setting all queue positions to null and setting
+        while ( size > 0 ) {
+            let queue[ size - 1 ] = null;
+            let typeList[ size - 1 ] = -1;
+            let size = size - 1;
+        }
+        
+        return this;
+    }
+
+    /** 
+        The method that is used to shift all the elements of the queue to the right
+        one position. We do this so we can insert into the front of the queue. 
+    */
+    method void shiftElementsRight() {
+        var int iterate;
+        let iterate = size;
+        
+        while ( iterate > 0 ) {
+            let queue[ iterate ] = queue[ iterate - 1 ];
+            let typeList[ iterate ] = typeList[ iterate - 1 ];
+            let iterate = iterate - 1; 
+        }
+        return;
+    }
+
+    /**    
+        This method is used to check if the size is going to exceed the capacity.
+        If it is going to then it returns true. 
+    */
+    method boolean checkCapacity() {
+        if ( size = capacity ) {
+            return true;
+        }
+        return false;
+    }
+    /** 
+        This method is used to re-allocate the queue's capacity when we try to insert when the 
+        queue's size is already at its capacity.
+    */
+    method void reallocMem() {
+        var Array tmpQueue, tmpTypeList;
+        var int iterate;
+
+        let tmpQueue = queue;
+        let tmpTypeList = typeList;
+
+        let capacity = capacity + QUEUE_ALLOC_UNIT;
+        let queue = Array.new( capacity );
+        let typeList = Array.new( capacity );
+        let iterate = size;
+
+        while ( iterate > 0 ) {
+            let queue[ iterate - 1 ] = tmpQueue[ iterate - 1 ]; 
+            let typeList[ iterate - 1 ] = tmpTypeList[ iterate - 1 ];
+            let iterate = iterate - 1;
+        }
+        do tmpQueue.dispose();
+        do tmpTypeList.dispose();
+        return;
+    }    
+    /**
+        This method is used to insert data into the queue. It will check the capacity prior to 
+        adding that way the queue doesn't go over its lotted space. If it is over then it will
+        call reallocMem(). Then it will insert the data into the array.
+    */
+    method void insert( int data ) {
+        if ( checkCapacity() ) {
+            // Reallocate to a bigger array.
+            do reallocMem();
+        } else {
+            // insert
+            if ( size > 0 ){
+                do shiftElementsRight();
+            }
+            let queue[ 0 ] = data;
+            let size = size + 1;
+        }
+        return;
+    }
+
+    /** 
+        This method is here to insert a character value. It will insert the data then it will 
+        update the typeList to hold the CHARACTER typeEnum.
+    */
+    method boolean insertChar( char data ) {
+        var int preSize;
+        let preSize = size;
+        do insert( data );
+        let typeList[ 0 ] = typeEnum.getCHARACTER();
+        if ( preSize < size ) { return true; }
+        else { return false };
+    }
+
+    /** 
+        This method is here to insert a integer value. It will insert the data then it will 
+        update the typeList to hold the INTEGER typeEnum.
+    */
+    method boolean insertInteger( int data ) {
+        var int preSize;
+        let preSize = size;
+        do insert( data );
+        let typeList[ 0 ] = typeEnum.getINTEGER();
+        if ( preSize < size ) { return true; }
+        else { return false };
+    }
+
+    /** 
+        This method is here to insert a Boolean value. It will insert the data then it will 
+        update the typeList to hold the BOOLEAN typeEnum.
+    */
+    method boolean insertBoolean( boolean data ) {
+        var int preSize;
+        let preSize = size;
+        do insert( data );
+        let typeList[ 0 ] = typeEnum.getBOOLEAN();
+        if ( preSize < size ) { return true; }
+        else { return false };
+    }
+
+    /** 
+        This method is used to return the first item in the queue. It returns it in
+        the form of an array. They first element being the data and the second being
+        the data type. This is necessary as this is the only way to keep track of 
+        what type the data is as everything is in 16-bit form. 
+    */
+    method Array deQueue() {
+        var Array returnArray;
+        let returnArray = Array.new(2);
+
+        let size = size - 1;
+        let returnArray[0] = queue[size];
+        let returnArray[1] = typeList[size];
+
+        let queue[ size ] = null;
+        let typeList[size] = -1;
+
+        return returnArray;
+    }
+
+    /** 
+        Prints this queue in FIFO order. 
+    */
+    method void print() {
+        var int iterate;
+        let iterate = size;
+
+        do Output.printString("Printing in the order of FIFO:");
+        while ( iterate > 0 ) {
+            do Output.println();
+            do Output.printString("   ");
+
+            if ( typeList[ iterate - 1 ] = typeEnum.getCHARACTER() ) {
+                do Output.printChar( queue[ iterate - 1] );
+            }
+            if ( typeList[ iterate - 1 ] = typeEnum.getINTEGER() ) {
+                do Output.printInt( queue[ iterate - 1 ] );
+            }
+            if ( typeList[ iterate - 1 ] = typeEnum.getBOOLEAN() ) {
+               if ( queue[ iterate ] = true ) {
+                    do Output.printString("true");
+                } else {
+                   do Output.printString("false");
+                }
+            }
+            let iterate = iterate - 1;
+        }
+        return;
+    }
+
+    /** 
+        Disposes this List by recursively disposing its tail. 
+    */
+    method void dispose() {
+        do queue.dispose();
+        do typeList.dispose();
+        do typeEnum.dispose();
+        // Uses an OS routine to recycle this object.
+        do Memory.deAlloc(this);
+        return;
+    }
+    
+
+}

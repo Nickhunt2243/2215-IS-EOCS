@@ -1,0 +1,54 @@
+// This is the Main.jack module of the Queue package. 
+// It is responsible for instantiating and testing the Queue.
+// 
+// Username: nrh9573
+// File: projects/09/Queue/Main.jack
+
+
+class Main {
+    function void main() {
+        // Creates and uses the Queue.
+        var Queue queue;
+        var Enum typeEnum;
+        var Array arr;
+        var boolean bool;
+
+
+        let queue = Queue.new();
+        let typeEnum = Enum.new();
+
+        do queue.insertInteger(2);  // puts int   2 into queue 
+        do queue.insertChar(32);    // puts char ' ' into the queue
+        do queue.insertChar(66);    // puts char 'B' into the queue
+        do queue.insertChar(97);    // puts char 'a' into the queue
+        do queue.insertChar(116);   // puts char 't' into the queue
+        let bool = queue.insertChar(115);   // puts char 's' into the queue
+        do queue.insertBoolean(bool);   // puts boolean true into the queue
+        
+        do queue.print();
+
+        do Output.println();
+        let arr = queue.deQueue();
+
+        if ( arr[ 1 ] = typeEnum.getCHARACTER() ){
+          do Output.printChar( arr[ 0 ] );
+        }
+        if ( arr[ 1 ] = typeEnum.getINTEGER() ) {
+          do Output.printInt( arr[ 0 ] );
+        }
+        if ( arr[ 1 ] = typeEnum.getBOOLEAN() ) {
+          if ( arr[ 0 ] = true ) {
+            do Output.printString("true");
+          } else {
+            do Output.printString("false");
+          }
+        }
+        do Output.println();
+        do queue.print();
+        
+        do arr.dispose();
+        do queue.dispose();
+
+      return;
+   }
+}

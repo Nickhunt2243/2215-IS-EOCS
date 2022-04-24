@@ -1,0 +1,39 @@
+// This is the Enum.jack module of the Queue package. 
+// It is responsible for implementing an Enum type for the jack 
+// language. This is meant to be used for other projects in the future.
+// Need to find a way to make variables final/constant.
+// 
+// Username: nrh9573
+// File: projects/09/Queue/Enum.jack
+
+class Enum {
+
+    // This is were we initialize our static variables (enumNames).
+    field int CHARACTER;
+    field int INTEGER;
+    field int BOOLEAN;
+   
+   constructor Enum new() {
+        
+        // This is where you would list your enums and initialize them with 
+        // incrementing integer values;
+        let CHARACTER = 0;
+        let INTEGER = 1;
+        let BOOLEAN = 2;
+        
+        return this; 
+   }
+
+   method int getINTEGER() { return INTEGER; }
+
+   method int getCHARACTER() { return CHARACTER; }
+
+   method int getBOOLEAN() { return BOOLEAN; }
+
+
+   method void dispose() {
+        do Memory.deAlloc( this );
+        return;
+   }
+   
+}
